@@ -8,7 +8,7 @@ const routes = Router();
 
 routes.post('/users', UserController.create);
 
-routes.get('/auth/:token', AuthenticationController.validate);
+routes.get('/auth', AuthenticationController.validate);
 routes.post('/auth', AuthenticationController.login);
 
 module.exports = routes;

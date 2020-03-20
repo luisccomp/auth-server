@@ -76,10 +76,55 @@ module.exports = {
      * @param {*} response 
      */
     async validate(request, response) {
-        return response
-            .status(200)
-            .json({
-                message: "Not implemented..."
-            });
+        const token = request.get('auth-token');
+
+        // Checking if a given token is valid or not. If token does'nt contains a valid signature, then server must
+        // return unauthorized error. This is a mean to protect API's from unauthorized access.
+        try {
+            const info = jwt.verify(token, process.env.TOKEN_SECRET);
+
+            const user = await User.findOne({ _id: info._id });
+
+            // Checking if there's a user with a given ID stored on database
+            if (!user)
+                return response
+                    .status(403)
+                    .json({
+                        message: "Unauthorized",
+                        details: {
+                            valid: false,
+                            error: "User doesn't exists on database."
+                        }
+                    });
+
+            return response
+                .status(200)
+                .json({
+                    message: "Authorized",
+                    details: {
+                        valid: true
+                    }
+                });
+        }
+        catch (error) {
+            console.log('Error:', error);
+            console.log('Invalid signature');
+
+            return response
+                .status(403)
+                .json({
+                    message: "Unauthorized",
+                    details: {
+                        valid: false,
+                        error
+                    }
+                });
+        }
+
+        // return response
+        //     .status(200)
+        //     .json({
+        //         message: "Not implemented..."
+        //     });
     }
 };

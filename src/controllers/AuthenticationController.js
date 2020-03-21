@@ -78,6 +78,13 @@ module.exports = {
     async validate(request, response) {
         const token = request.get('auth-token');
 
+        if (!token)
+            return response
+                .status(400)
+                .json({
+                    message: 'Authentication token is required'
+                });
+
         // Checking if a given token is valid or not. If token does'nt contains a valid signature, then server must
         // return unauthorized error. This is a mean to protect API's from unauthorized access.
         try {
@@ -107,8 +114,8 @@ module.exports = {
                 });
         }
         catch (error) {
-            console.log('Error:', error);
-            console.log('Invalid signature');
+            // console.log('Error:', error);
+            // console.log('Invalid signature');
 
             return response
                 .status(403)
